@@ -50,7 +50,7 @@ cc.Class({
   placeEnemy() {
     let x = cc.winSize.width / 2 - this.enemyNode.width / 2
     let y = (Math.random() * cc.winSize.height) / 4
-    let dua = 0.6 + Math.random() * 0.5
+    let dua = 1 + Math.random() * 0.5
     this.enemyNode.active = true
     this.enemyNode.x = 0
     this.enemyNode.y = cc.winSize.height / 3 - this.enemyNode.height / 2
@@ -69,6 +69,7 @@ cc.Class({
         this.die()
       })
     )
+    this.playerNode.stopAction(this.playerAction)
     this.playerAction = this.playerNode.runAction(seq)
   },
 
