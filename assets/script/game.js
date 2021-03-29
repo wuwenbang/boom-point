@@ -5,14 +5,18 @@ cc.Class({
     enemyNode: cc.Node,
     boomNode: cc.Node,
     scoreLabel: cc.Label,
+    button: cc.Button,
+    duration: 1,
   },
   onLoad() {
     // let particle = this.boomNode.getComponent(cc.ParticleSystem)
     // particle.resetSystem()
+    this.button.node.on('click', this.restart, this)
     this.score = 0
     this.placePlayer()
     this.placeEnemy()
     this.node.on('touchstart', this.fire, this) //绑定点击事件
+    this.button.node.active = false
   },
   onDestroy() {
     this.node.off('touchstart', this.fire, this) //解绑点击事件
@@ -30,14 +34,20 @@ cc.Class({
       this.scoreLabel.string = ++this.score
       this.placePlayer()
       this.placeEnemy()
+      this.duration = this.duration > 0.5 ? this.duration - 0.025 : 0.5
     }
+  },
+  // 重新开始
+  restart() {
+    cc.director.loadScene('game')
   },
   // 放置玩家节点
   placePlayer() {
     this.isFire = false
     this.playerNode.active = true
     this.playerNode.y = -cc.winSize.height / 4
-    let dua = 10
+    let dua = this.duration * 10
+    console.log('dua', dua)
     let seq = cc.sequence(
       cc.moveTo(dua, cc.v2(this.playerNode.x, -(cc.winSize.height / 2 - this.playerNode.height / 2))),
       cc.callFunc(() => {
@@ -50,7 +60,7 @@ cc.Class({
   placeEnemy() {
     let x = cc.winSize.width / 2 - this.enemyNode.width / 2
     let y = (Math.random() * cc.winSize.height) / 4
-    let dua = 1 + Math.random() * 0.5
+    let dua = this.duration + Math.random() * 0.5
     this.enemyNode.active = true
     this.enemyNode.x = 0
     this.enemyNode.y = cc.winSize.height / 3 - this.enemyNode.height / 2
@@ -78,14 +88,11 @@ cc.Class({
     console.log('游戏结束')
     this.playerNode.active = false
     this.boom(this.playerNode.position, this.playerNode.color)
-    setTimeout(() => {
-      cc.director.loadScene('game')
-    }, 1000)
+    this.button.node.active = true
   },
 
   //爆炸
   boom(pos, color) {
-    console.log('pos', pos)
     this.boomNode.setPosition(pos)
     let particle = this.boomNode.getComponent(cc.ParticleSystem)
     if (color !== undefined) {
